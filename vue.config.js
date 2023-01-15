@@ -3,7 +3,7 @@ module.exports = defineConfig({
   transpileDependencies: true,
   pluginOptions: {
     electronBuilder: {
-      externals: []
+      nodeIntegration: true,
     }
   }
 })

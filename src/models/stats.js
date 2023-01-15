@@ -33,3 +33,10 @@ for (let file of files) {
 for( let scenario in Stats.scenarios ) {
     console.log(`Scenario: ${scenario}: ${Stats.scenarios[scenario].length} scores`);
 }
+
+import { ipcMain } from 'electron';
+// Register IPC listeners
+ipcMain.on('stats-get-scenarios', (event, arg) => {
+    console.log('stats-get-scenarios');
+    event.returnValue = Object.keys(Stats.scenarios);
+});
