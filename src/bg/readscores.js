@@ -1,25 +1,36 @@
 // Read Score Data from a file
 const KOVAAKS_STATS_PATH = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\stats";
 
-import { readFileSync, readdirSync } from 'fs';
+// files.sort((a, b) => {
+//     let rx = /(\d{4}\.\d{2}\.\d{2})-(\d{2}\.\d{2}\.\d{2})/;
+//     let aDate = rx.exec(a)[1];
+//     let aTime = rx.exec(a)[2];
+//     let bDate = rx.exec(b)[1];
+//     let bTime = rx.exec(b)[2];
+//     return bDate.localeCompare(aDate) || bTime.localeCompare(aTime);
+// });
+
+import chokidar from 'chokidar';
+import { Score } from '../models/score.js'
+import { readdirSync } from 'fs';
 import { join } from 'path';
-
-// Get the list of files in the stats directory
-const files = readdirSync(KOVAAKS_STATS_PATH);
-
-// Files are named like: "<scenario name> - Challenge - <date>-<time> Stats.csv"
-// or "<scenario name> - <date>-<time> Stats.csv"
-// Order by date and time
-files.sort((a, b) => {
-    let rx = /(\d{4}\.\d{2}\.\d{2})-(\d{2}\.\d{2}\.\d{2})/;
-    let aDate = rx.exec(a)[1];
-    let aTime = rx.exec(a)[2];
-    let bDate = rx.exec(b)[1];
-    let bTime = rx.exec(b)[2];
-    return bDate.localeCompare(aDate) || bTime.localeCompare(aTime);
+// Watch for new files
+const watcher = chokidar.watch(KOVAAKS_STATS_PATH, {
+    ignored: /(^|[\/\\])\../,
+    persistent: true,
+    awaitWriteFinish: {
+        stabilityThreshold: 1000,
+        pollInterval: 100
+    },
+    ignoreInitial: true,
 });
 
-// Read the first file
-import { Score } from '../models/score.js';
-let score = Score.fromCSVFile(join(KOVAAKS_STATS_PATH, files[0]));
-console.log(score.toString());
+const files = readdirSync(KOVAAKS_STATS_PATH);
+for (let file of files) {
+    Score.fromCSVFile(join(KOVAAKS_STATS_PATH, file));
+}
+
+watcher.on('add', path => {
+    console.log(`File ${path} has been added`);
+    Score.fromCSVFile(path);
+});

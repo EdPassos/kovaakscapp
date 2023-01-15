@@ -1,8 +1,8 @@
 const KOVAAKS_STATS_PATH = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\stats";
 
-import { readdirSync } from 'fs';
-import { join } from 'path';
-import { Score } from './score.js';
+// import { readdirSync } from 'fs';
+// import { join } from 'path';
+// import { Score } from './score.js';
 
 class StatsSingleton {
     constructor() {
@@ -27,12 +27,6 @@ class StatsSingleton {
 
 const Stats = new StatsSingleton();
 
-const files = readdirSync(KOVAAKS_STATS_PATH);
-for (let file of files) {
-    let score = Score.fromCSVFile(join(KOVAAKS_STATS_PATH, file));
-    Stats.addScore(score);
-}
-
 import { ipcMain } from 'electron';
 // Register IPC listeners
 ipcMain.on('stats-get-scenarios', (event, arg) => {
@@ -49,3 +43,6 @@ ipcMain.on('stats-get-scenarios', (event, arg) => {
     }
     event.returnValue = stats;
 });
+
+
+export { Stats };

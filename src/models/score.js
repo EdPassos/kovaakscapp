@@ -1,4 +1,6 @@
 import { readFileSync } from 'fs';
+import { Stats } from './stats.js';
+console.log(Stats)
 
 const KOVAAKS_STATS_PATH = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\stats";
 
@@ -50,6 +52,7 @@ class Score {
                     break;
             }
         }
+        Stats.addScore(score);
         return score;
     }
 
