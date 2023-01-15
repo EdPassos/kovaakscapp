@@ -2,7 +2,7 @@
   <div class="home">
     <ul class="scenarios">
       <li v-for="scenario in scenarios" :key="scenario.id" class="scenario">
-        <router-link :to="{ name: 'scenario', params: { scenario } }">
+        <router-link :to="{ name: 'scenario', params: { scenario: scenario.name } }">
           <span v-text="scenario.name"></span>
           <span v-text="scenario.plays"></span>
           <span v-text="scenario.best"></span>

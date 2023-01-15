@@ -1,11 +1,37 @@
 <template>
   <nav>
-    <router-link to="/">Home</router-link>
+    <router-link :to="{ name: 'home' }">Home</router-link>
   </nav>
-  <router-view/>
+  <router-view ref="view" />
 </template>
 
+<script>
+import { ipcRenderer } from 'electron';
+
+export default {
+  name: 'App',
+  data() {
+    return {
+    }
+  },
+  mounted() {
+    ipcRenderer.on('scenario-updated', (event, scenario) => {
+      this.$router.push({ name: 'scenario', params: { scenario } });
+    });
+    ipcRenderer.send('get-scenario-updates')
+  }
+}
+</script>
+
 <style lang="scss">
+body, html {
+  height: 100%;
+  margin: 0;
+}
+html {
+  font-size: 16px;
+  background-color: #1a1a1a;
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

@@ -14,6 +14,7 @@ class Score {
         this.fov = 103;
         this.fov_scale = "";
         this.damage = 0;
+        this.hash = "";
     }
 
     static fromCSV(csv) {
@@ -26,8 +27,7 @@ class Score {
             switch(key) {
                 case "Scenario:":
                     score.scenario = value.replace(/\r$/, "");
-                    // trim whitespace
-                    score.scenario = score.scenario.replace(/^\s+|\s+$/g, '');
+                    score.scenario = score.scenario.replace(/^\s+|\s+$/g, ''); // trim
                     break;
                 case "Score:":
                     score.score = parseFloat(value);
@@ -49,6 +49,9 @@ class Score {
                     break;
                 case "Damage Done:":
                     score.damage = parseFloat(value);
+                    break;
+                case "Hash:":
+                    score.hash = value;
                     break;
             }
         }

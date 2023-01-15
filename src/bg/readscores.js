@@ -30,7 +30,15 @@ for (let file of files) {
     Score.fromCSVFile(join(KOVAAKS_STATS_PATH, file));
 }
 
+import { ipcMain } from 'electron';
+var scenarioUpdateEvent = null
+ipcMain.on('get-scenario-updates', (event) => {
+    scenarioUpdateEvent = event;
+});
+
 watcher.on('add', path => {
-    console.log(`File ${path} has been added`);
-    Score.fromCSVFile(path);
+    let score = Score.fromCSVFile(path);
+    if( scenarioUpdateEvent ) {
+        scenarioUpdateEvent.sender.send('scenario-updated', score.scenario);
+    }
 });

@@ -21,6 +21,9 @@ class StatsSingleton {
             this.scenarios[score.scenario].scores = [];
         }
         this.scenarios[score.scenario].scores.push(score);
+        if( this.scenarios[score.scenario].best === undefined || score.score > this.scenarios[score.scenario].best ) {
+            this.scenarios[score.scenario].best = score.score;
+        }
     }
 
 }
@@ -42,6 +45,10 @@ ipcMain.on('stats-get-scenarios', (event, arg) => {
         });
     }
     event.returnValue = stats;
+});
+
+ipcMain.on('stats-get-scenario', (event, scenario) => {
+    event.returnValue = Stats.scenarios[scenario];
 });
 
 
