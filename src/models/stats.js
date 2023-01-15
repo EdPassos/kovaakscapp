@@ -17,7 +17,10 @@ class StatsSingleton {
         if(!this.scenarios[score.scenario]) {
             this.scenarios[score.scenario] = [];
         }
-        this.scenarios[score.scenario].push(score);
+        if(!this.scenarios[score.scenario].scores) {
+            this.scenarios[score.scenario].scores = [];
+        }
+        this.scenarios[score.scenario].scores.push(score);
     }
 
 }
@@ -30,13 +33,19 @@ for (let file of files) {
     Stats.addScore(score);
 }
 
-for( let scenario in Stats.scenarios ) {
-    console.log(`Scenario: ${scenario}: ${Stats.scenarios[scenario].length} scores`);
-}
-
 import { ipcMain } from 'electron';
 // Register IPC listeners
 ipcMain.on('stats-get-scenarios', (event, arg) => {
-    console.log('stats-get-scenarios');
-    event.returnValue = Object.keys(Stats.scenarios);
+    let scenarios = Object.keys(Stats.scenarios);
+    let stats = [];
+    for (let scenario of scenarios) {
+        stats.push({
+            name: scenario,
+            plays: Stats.scenarios[scenario].scores.length,
+            best: Stats.scenarios[scenario].scores.reduce((best, score) => {
+                return score.score > best ? score.score : best;
+            }, 0)
+        });
+    }
+    event.returnValue = stats;
 });

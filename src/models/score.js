@@ -24,6 +24,8 @@ class Score {
             switch(key) {
                 case "Scenario:":
                     score.scenario = value.replace(/\r$/, "");
+                    // trim whitespace
+                    score.scenario = score.scenario.replace(/^\s+|\s+$/g, '');
                     break;
                 case "Score:":
                     score.score = parseFloat(value);
