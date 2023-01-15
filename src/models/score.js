@@ -1,5 +1,7 @@
 import { readFileSync } from 'fs';
 
+const KOVAAKS_STATS_PATH = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\stats";
+
 class Score {
     constructor() {
         this.scenario = "";
@@ -21,7 +23,7 @@ class Score {
             let value = parts[1];
             switch(key) {
                 case "Scenario:":
-                    score.scenario = value;
+                    score.scenario = value.replace(/\r$/, "");
                     break;
                 case "Score:":
                     score.score = parseFloat(value);
@@ -67,5 +69,19 @@ Damage: ${this.damage}
     }
 
 }
+
+// Files are named like: "<scenario name> - Challenge - <date>-<time> Stats.csv"
+// or "<scenario name> - <date>-<time> Stats.csv"
+// Order by date and time
+// files.sort((a, b) => {
+//     let rx = /(\d{4}\.\d{2}\.\d{2})-(\d{2}\.\d{2}\.\d{2})/;
+//     let aDate = rx.exec(a)[1];
+//     let aTime = rx.exec(a)[2];
+//     let bDate = rx.exec(b)[1];
+//     let bTime = rx.exec(b)[2];
+//     return bDate.localeCompare(aDate) || bTime.localeCompare(aTime);
+// });
+
+
 
 export { Score };

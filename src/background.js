@@ -5,7 +5,7 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
-import './bg/readscores.js'
+import './models/stats.js'
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
