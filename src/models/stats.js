@@ -24,6 +24,9 @@ class StatsSingleton {
         if( this.scenarios[score.scenario].best === undefined || score.score > this.scenarios[score.scenario].best ) {
             this.scenarios[score.scenario].best = score.score;
         }
+        if( this.scenarios[score.scenario].last_played_at === undefined || score.played_at > this.scenarios[score.scenario].last_played_at ) {
+            this.scenarios[score.scenario].last_played_at = score.played_at;
+        }
     }
 
 }
@@ -39,9 +42,8 @@ ipcMain.on('stats-get-scenarios', (event, arg) => {
         stats.push({
             name: scenario,
             plays: Stats.scenarios[scenario].scores.length,
-            best: Stats.scenarios[scenario].scores.reduce((best, score) => {
-                return score.score > best ? score.score : best;
-            }, 0)
+            best: Stats.scenarios[scenario].best,
+            last_played_at: Stats.scenarios[scenario].last_played_at
         });
     }
     event.returnValue = stats;

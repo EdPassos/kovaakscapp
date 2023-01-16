@@ -5,7 +5,8 @@ console.log(Stats)
 const KOVAAKS_STATS_PATH = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\stats";
 
 class Score {
-    constructor() {
+    constructor(played) {
+        this.played_at = played;
         this.scenario = "";
         this.score = 0;
         this.kills = 0;
@@ -17,8 +18,8 @@ class Score {
         this.hash = "";
     }
 
-    static fromCSV(csv) {
-        let score = new Score();
+    static fromCSV(csv, played) {
+        let score = new Score(played);
         for(let line of csv.split("\n")) {
             let parts = line.split(",");
             if(parts.length < 2) continue;
@@ -60,8 +61,13 @@ class Score {
     }
 
     static fromCSVFile(path) {
+        let filename = path.split("\\").pop(); 
+        let rx = /(\d{4}\.\d{2}\.\d{2})-(\d{2}\.\d{2}\.\d{2})/;
+        let date = rx.exec(filename)[1].replace(/\./g, "-");
+        let time = rx.exec(filename)[2].replace(/\./g, ":")
+        let played_at = new Date(date + " " + time);
         let csv = readFileSync(path).toString()
-        return Score.fromCSV(csv);
+        return Score.fromCSV(csv, played_at);
     }
 
     toString() {

@@ -6,6 +6,7 @@
           <span v-text="scenario.name"></span>
           <span v-text="scenario.plays"></span>
           <span v-text="scenario.best"></span>
+          <span v-text="scenario.last_played_at"></span>
         </router-link>
       </li>
     </ul>
@@ -23,7 +24,7 @@ export default {
   data() {
     return {
       scenarios: [],
-      sortBy: 'plays',
+      sortBy: 'last_played_at',
       sortOrder: 'desc',
     }
   },
@@ -81,12 +82,15 @@ export default {
     border-bottom: none;
   }
   a {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    display: flex;
     grid-gap: 1rem;
     padding: 1rem;
     color: #fff;
     text-decoration: none;
+    span {
+      flex: 1;
+      flex-basis: 0;
+    }
     &:hover {
       background: #333;
     }
