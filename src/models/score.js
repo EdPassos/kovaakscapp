@@ -65,7 +65,7 @@ class Score {
         let rx = /(\d{4}\.\d{2}\.\d{2})-(\d{2}\.\d{2}\.\d{2})/;
         let date = rx.exec(filename)[1].replace(/\./g, "-");
         let time = rx.exec(filename)[2].replace(/\./g, ":")
-        let played_at = new Date(date + " " + time);
+        let played_at = (new Date(date + " " + time)).getTime();
         let csv = readFileSync(path).toString()
         return Score.fromCSV(csv, played_at);
     }
