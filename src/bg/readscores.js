@@ -30,7 +30,6 @@ const files = readdirSync(KOVAAKS_STATS_PATH);
 for (let file of files) {
     Score.fromCSVFile(join(KOVAAKS_STATS_PATH, file));
 }
-Stats.calcScenarioMovingAverages(10);
 
 import { ipcMain } from 'electron';
 var scenarioUpdateEvent = null

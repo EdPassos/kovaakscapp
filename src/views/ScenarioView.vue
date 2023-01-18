@@ -1,13 +1,15 @@
 <template>
-  <div class="scenario" v-if="scenarioData">
+  <div class="scenario">
     <h1 v-text="scenario"></h1>
-    <h2 v-text="scenarioData.best"></h2>
+    <h2 v-text="scenarioData.best" v-if="scenarioData"></h2>
     <h2 v-text="average"></h2>
     <h2 v-text="movingAverage"></h2>
 
-    <canvas ref="chart" width="400" height="400"></canvas>
+    <div class="graph">
+      <canvas ref="chart" width="400" height="400"></canvas>
+    </div>
 
-    <div class="sort">
+    <div class="sort" v-if="scenarioData">
       <button
         v-for="key in Object.keys(scenarioData.scores[0])"
         :key="key"
@@ -17,7 +19,7 @@
       </button>
     </div>
 
-    <ul>
+    <ul v-if="scenarioData">
       <li v-for="score, index in scenarioData.scores" :key="score.hash">
         <div class="score">
           <span v-text="score.score"></span>
@@ -51,6 +53,7 @@ export default {
       updateListener: null,
       sortBy: 'played_at',
       sortOrder: 'desc',
+      chart: null,
     };
   },
   methods: {
@@ -69,6 +72,60 @@ export default {
       let scenarioData = ipcRenderer.sendSync('stats-get-scenario', this.scenario);
       this.scenarioData = scenarioData;
     },
+    createGraph() {
+      if( !this.scenarioData ) return;
+      if( !this.$refs.chart ) return;
+      let scores = this.scenarioData.scores.map(row => ({
+        score: row.score,
+        movingAverage: row.movingAverage,
+        played_at: row.played_at,
+        exponentialMovingAverage: row.exponentialMovingAverage
+      }));
+      scores.sort((a, b) => a.played_at - b.played_at);
+      this.chart = new Chart(
+        this.$refs.chart,
+        {
+          type: 'line',
+          data: {
+            labels: scores.map(row => row.played_at),
+            datasets: [
+              {
+                label: 'Score',
+                data: scores.map(row => row.score),
+                tension: 0.3,
+              },
+              {
+                label: 'Moving Average',
+                data: this.scenarioData.simpleMovingAverages,
+                tension: 0.3,
+              },
+              {
+                label: 'Exponential Moving Average',
+                data: this.scenarioData.exponentialMovingAverages,
+                tension: 0.3,
+              }
+            ]
+          },
+          options: {
+            scales: {
+              x: {
+                display: false,
+              }
+            }
+          }
+        }
+      );
+    },
+    updateGraph() {
+      if( !this.chart ) {
+        this.createGraph();
+      } else {
+        this.chart.data.datasets[0].data = this.scenarioData.scores.map(row => row.score);
+        this.chart.data.datasets[1].data = this.scenarioData.simpleMovingAverages;
+        this.chart.data.datasets[2].data = this.scenarioData.exponentialMovingAverages;
+        this.chart.update();
+      }
+    }
   },
   computed: {
     average() {
@@ -104,6 +161,7 @@ export default {
       immediate: true,
       handler() {
         sort(this.scenarioData.scores, this.sortBy, this.sortOrder);
+        this.updateGraph()
       },
     },
     sortBy: {
@@ -124,48 +182,7 @@ export default {
       }
     };
     ipcRenderer.on('scenario-updated', this.updateListener);
-
-    let scores = this.scenarioData.scores.map(row => ({
-      score: row.score,
-      movingAverage: row.movingAverage,
-      played_at: row.played_at,
-      exponentialMovingAverage: row.exponentialMovingAverage
-    }));
-    scores.sort((a, b) => a.played_at - b.played_at);
-    new Chart(
-      this.$refs.chart,
-      {
-        type: 'line',
-        data: {
-          labels: scores.map(row => row.played_at),
-          datasets: [
-            {
-              label: 'Score',
-              data: scores.map(row => row.score),
-              tension: 0.3,
-            },
-            {
-              label: 'Moving Average',
-              data: scores.map(row => row.movingAverage),
-              tension: 0.3,
-            },
-            {
-              label: 'Exponential Moving Average',
-              data: scores.map(row => row.exponentialMovingAverage),
-              tension: 0.3,
-            }
-          ]
-        },
-        options: {
-          scales: {
-            x: {
-              display: false,
-            }
-          }
-        }
-      }
-    );
-
+    this.updateGraph();
   },
   unmounted() {
     ipcRenderer.removeListener('scenario-updated', this.updateListener);
