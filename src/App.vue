@@ -19,10 +19,17 @@ export default {
   },
   mounted() {
     ipcRenderer.on('scenario-updated', (event, scenario) => {
+      if( this.$route.name === 'scenario' && this.$route.params.scenario == scenario ) {
+        console.log('Scenario is already open, not navigating')
+        return;
+      }
       this.$router.push({ name: 'scenario', params: { scenario } });
     });
     ipcRenderer.send('get-scenario-updates')
-  }
+  },
+  unmounted() {
+    ipcRenderer.removeAllListeners('scenario-updated');
+  },
 }
 </script>
 
@@ -30,7 +37,7 @@ export default {
 @import 'normalize.css';
 
 $drag-height: 31px;
-$bg-color: #1a1a1a;
+$bg-color: #282828;
 
 * {
   box-sizing: border-box;
@@ -58,22 +65,27 @@ html {
   height: var(--drag-height);
   -webkit-app-region: drag;
   background-color: var(--bg-color);
+  position: relative;
+  z-index: 1000;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 #main {
   height: calc(100vh - var(--drag-height));
   overflow: auto;
   position: relative;
-  &::before {
-    content: '';
-    position: fixed;
-    top: var(--drag-height);
-    left: 0;
-    width: calc(100% - var(--scrollbar-width));
-    height: 50px;
-    background-image: linear-gradient(180deg, rgba($bg-color, 1), rgba($bg-color, 0));
-    z-index: 1;
-    pointer-events: none;
+  &.top {
+    &::before {
+      content: '';
+      position: fixed;
+      top: var(--drag-height);
+      left: 0;
+      width: calc(100% - var(--scrollbar-width));
+      height: 50px;
+      background-image: linear-gradient(180deg, rgba($bg-color, 1), rgba($bg-color, 0));
+      z-index: 1;
+      pointer-events: none;
+    }
   }
 }
 

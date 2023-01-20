@@ -5,9 +5,7 @@
     <h2 v-text="average"></h2>
     <h2 v-text="movingAverage"></h2>
 
-    <div class="graph">
-      <canvas ref="chart" width="400" height="400"></canvas>
-    </div>
+    <ScoreGraph :scenario="scenarioData" v-if="scenarioData"></ScoreGraph>
 
     <div class="sort" v-if="scenarioData">
       <button
@@ -20,7 +18,7 @@
     </div>
 
     <ul v-if="scenarioData">
-      <li v-for="score, index in scenarioData.scores" :key="score.hash">
+      <li v-for="score, index in scenarioData.scores" :key="score.played_at">
         <div class="score">
           <span v-text="score.score"></span>
           <span
@@ -39,11 +37,14 @@
 
 <script>
 import { ipcRenderer } from 'electron'
-import { sort } from '../utils/sort.js'
-import Chart from 'chart.js/auto'
+
+import ScoreGraph from '@/components/ScoreGraph.vue'
 
 export default {
   name: 'ScenarioView',
+  components: {
+    ScoreGraph
+  },
   props: {
     scenario: { type: String, required: true }
   },
@@ -66,66 +67,12 @@ export default {
     },
     scoreDateFormat(score) {
       // compact date format with time in a 24-hour clock
-      return score.played_at.toLocaleString('en-GB', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+      let played_at = new Date(score.played_at);
+      return played_at.toLocaleString('en-GB', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
     }, 
     getScenario() {
-      let scenarioData = ipcRenderer.sendSync('stats-get-scenario', this.scenario);
-      this.scenarioData = scenarioData;
+      this.scenarioData = ipcRenderer.sendSync('stats-get-scenario', this.scenario);
     },
-    createGraph() {
-      if( !this.scenarioData ) return;
-      if( !this.$refs.chart ) return;
-      let scores = this.scenarioData.scores.map(row => ({
-        score: row.score,
-        movingAverage: row.movingAverage,
-        played_at: row.played_at,
-        exponentialMovingAverage: row.exponentialMovingAverage
-      }));
-      scores.sort((a, b) => a.played_at - b.played_at);
-      this.chart = new Chart(
-        this.$refs.chart,
-        {
-          type: 'line',
-          data: {
-            labels: scores.map(row => row.played_at),
-            datasets: [
-              {
-                label: 'Score',
-                data: scores.map(row => row.score),
-                tension: 0.3,
-              },
-              {
-                label: 'Moving Average',
-                data: this.scenarioData.simpleMovingAverages,
-                tension: 0.3,
-              },
-              {
-                label: 'Exponential Moving Average',
-                data: this.scenarioData.exponentialMovingAverages,
-                tension: 0.3,
-              }
-            ]
-          },
-          options: {
-            scales: {
-              x: {
-                display: false,
-              }
-            }
-          }
-        }
-      );
-    },
-    updateGraph() {
-      if( !this.chart ) {
-        this.createGraph();
-      } else {
-        this.chart.data.datasets[0].data = this.scenarioData.scores.map(row => row.score);
-        this.chart.data.datasets[1].data = this.scenarioData.simpleMovingAverages;
-        this.chart.data.datasets[2].data = this.scenarioData.exponentialMovingAverages;
-        this.chart.update();
-      }
-    }
   },
   computed: {
     average() {
@@ -157,23 +104,6 @@ export default {
         this.getScenario();
       },
     },
-    scenarioData: {
-      immediate: true,
-      handler() {
-        sort(this.scenarioData.scores, this.sortBy, this.sortOrder);
-        this.updateGraph()
-      },
-    },
-    sortBy: {
-      handler() {
-        sort(this.scenarioData.scores, this.sortBy, this.sortOrder);
-      },
-    },
-    sortOrder: {
-      handler() {
-        sort(this.scenarioData.scores, this.sortBy, this.sortOrder);
-      },
-    },
   },
   mounted() {
     this.updateListener = (event, scenario) => {
@@ -182,7 +112,6 @@ export default {
       }
     };
     ipcRenderer.on('scenario-updated', this.updateListener);
-    this.updateGraph();
   },
   unmounted() {
     ipcRenderer.removeListener('scenario-updated', this.updateListener);
