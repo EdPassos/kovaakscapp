@@ -1,5 +1,5 @@
 <template>
-  <div class="graph">
+  <div class="graph" :style="style">
     <canvas ref="chart" width="400" height="200"></canvas>
   </div>
 </template>
@@ -13,6 +13,7 @@ export default {
   props: {
     scenario: { required: true },
     limit: { type: Number, default: 100 },
+    highlightColor: { type: String, default: '#fbc531' },
   },
   data() {
     return {
@@ -84,6 +85,11 @@ export default {
     }
   },
   computed: {
+    style() {
+      return {
+        '--highlight-color': this.highlightColor,
+      }
+    }
   },
   watch: {
     scenario: {
@@ -95,14 +101,12 @@ export default {
   },
   mounted() {
     this.updateGraph();
-    console.log('mounted')
   },
 };
 </script>
 
 <style lang="scss" scoped>
 .graph {
-  --highlight-color: #fbc531;
   background-image: linear-gradient(315deg, #2d3436 0%, #1d1416 74%);
   border-radius: 16px;
   border: 2px solid var(--highlight-color);
