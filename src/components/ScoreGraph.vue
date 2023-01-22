@@ -101,9 +101,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.graph { //card like design dark mode
+.graph {
+  --highlight-color: #fbc531;
   background-image: linear-gradient(315deg, #2d3436 0%, #1d1416 74%);
-  border-radius: 5px;
+  border-radius: 16px;
+  border: 2px solid var(--highlight-color);
   padding: 1rem;
   margin: 1rem;
   height: 100%;
@@ -111,6 +113,6 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  filter: drop-shadow(0 0 8px var(--highlight-color));
 }
 </style>
