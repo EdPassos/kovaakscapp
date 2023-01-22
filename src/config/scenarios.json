@@ -1,0 +1,32 @@
+[
+    {
+        "name": "VT Air Advanced Small",
+        "hash": "0b0f7a3b78a1dcc1d31dcf45a3613b00",
+        "timeLimit": "0",
+        "categories": ["REACTIVE_TRACKING"]
+    },
+    {
+        "name": "VT Air Intermediate",
+        "hash": "6c8a32e397f020abbfa5cc2b07879fab",
+        "timeLimit": "60",
+        "categories": ["REACTIVE_TRACKING"]
+    },
+    {
+        "name": "VT Air Novice",
+        "hash": "7327a375295bccc0ef63fca4c9801b8b",
+        "timeLimit": "0",
+        "categories": ["REACTIVE_TRACKING"]
+    },
+    {
+        "name": "VT Air Varied Intermediate",
+        "hash": "e363bbc929acd65d514690865430aab9",
+        "timeLimit": "0",
+        "categories": ["REACTIVE_TRACKING"]
+    },
+    {
+        "name": "VT Air Varied Novice",
+        "hash": "1878699b93d9fabdc6a5aed9b878b226",
+        "timeLimit": "0",
+        "categories": ["REACTIVE_TRACKING"]
+    }
+]

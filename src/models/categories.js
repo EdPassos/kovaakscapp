@@ -5,6 +5,9 @@ class Category {
         this.name = name;
         this.color = color;
         this.parent = parent;
+        if( parent != null ) parent.children.push(this);
+        this.children = [];
+        this.scenarios = [];
     }
 }
 

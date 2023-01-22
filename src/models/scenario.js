@@ -1,11 +1,32 @@
+import categories from './categories';
+
+var SCENARIOS = {}
 
 class Scenario {
-    constructor(name) {
-        this.name = name;
+    constructor(data) {
+        this.categories = [];
+        for(let i = 0; i < data.categories.length; i++) {
+            this.categories.push(categories[data.categories[i]]);
+        }
+        this.hash = data.hash;
+        this.name = data.name;
         this.scores = [];
         this.simpleMovingAverages = [];
         this.exponentialMovingAverages = [];
         this.last_played_at = null;
+        for( let category of this.categories ) {
+            category.scenarios.push(this);
+        }
+        SCENARIOS[this.hash] = this;
+    }
+
+    static getByName(name) {
+        let scenario = Object.values(SCENARIOS).find((scenario) => { return scenario.name == name; });
+        if( scenario == null ) {
+            console.error("Scenario not found: " + name);
+            return new Scenario({name: name, categories: []});
+        }
+        return scenario;
     }
 
     addScore(score) {
@@ -39,7 +60,17 @@ class Scenario {
         }
         return alpha * this.scores[lastIndex].score + (1 - alpha) * this.exponentialMovingAverages[lastIndex - 1];
     }
+}
 
+// Read scenarios from config file
+import scenarios from '../config/scenarios.json';
+
+// Create scenario objects
+let scenarioObjects = [];
+for(let i = 0; i < scenarios.length; i++) {
+    let newScenario = new Scenario(scenarios[i]);
+    console.log(newScenario)
+    scenarioObjects.push(newScenario);
 }
 
 export { Scenario }

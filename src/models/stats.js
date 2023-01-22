@@ -12,7 +12,7 @@ class StatsSingleton {
 
     addScore(score) {
         if(!this.scenarios[score.scenario]) {
-            this.scenarios[score.scenario] = new Scenario(score.scenario);
+            this.scenarios[score.scenario] = Scenario.getByName(score.scenario);
         }
 
         // Add score to scenario scores in the first position
