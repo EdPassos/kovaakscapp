@@ -12,6 +12,7 @@ export default {
   name: 'ScenarioView',
   props: {
     scenario: { required: true },
+    limit: { type: Number, default: 100 },
   },
   data() {
     return {
@@ -29,28 +30,31 @@ export default {
         exponentialMovingAverage: row.exponentialMovingAverage
       }));
       scores.sort((a, b) => a.played_at - b.played_at);
+      let lastScores = scores.slice(-this.limit);
+      let lastSimpleMovingAverages = this.scenario.simpleMovingAverages.slice(-this.limit);
+      let lastExponentialMovingAverages = this.scenario.exponentialMovingAverages.slice(-this.limit);
       this.chart = shallowRef( new Chart(
         this.$refs.chart,
         {
           type: 'line',
           data: {
-            labels: scores.map(row => row.played_at),
+            labels: lastScores.map(row => row.played_at),
             datasets: [
               {
                 label: 'Moving Average',
-                data: this.scenario.simpleMovingAverages,
+                data: lastSimpleMovingAverages,
                 tension: 0.3,
                 pointRadius: 0,
               },
               {
                 label: 'Exponential Moving Average',
-                data: this.scenario.exponentialMovingAverages,
+                data: lastExponentialMovingAverages,
                 tension: 0.3,
                 pointRadius: 0,
               },
               {
                 label: 'Score',
-                data: scores.map(row => row.score),
+                data: lastScores.map(row => row.score),
                 tension: 0.3,
                 pointRadius: 0,
               },
